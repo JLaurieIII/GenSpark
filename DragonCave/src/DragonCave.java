@@ -67,4 +67,12 @@ public class DragonCave {
             print("Leads you to the treasure chest!");
         }
     }
+
+    public void setUserInput(int userInput) {
+        this.userInput = userInput;
+    }
+
+    public int getUserInput() {
+        return userInput;
+    }
 }
