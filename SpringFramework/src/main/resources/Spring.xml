@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"> <!-- bean definitions here -->
+
+
+    <bean id="Address" class="Address">
+        <property name="city" value="Venice" />
+        <property name="state" value="FL" />
+        <property name="country" value="US" />
+        <property name="zipcode" value="34293" />
+    </bean>
+
+    <bean id="Address1" class="Address">
+        <property name="city" value="Venice" />
+        <property name="state" value="FL" />
+        <property name="country" value="US" />
+        <property name="zipcode" value="34293" />
+    </bean>
+
+    <bean id="Phone" class="Phone">
+        <property name="mob" value="941-234-5698" />
+    </bean>
+
+    <bean id="Phone1" class="Phone">
+        <property name="mob" value="941-234-5698" />
+    </bean>
+
+
+    <!-- setter injection -->
+    <bean id="Student" class="Student">
+        <property name="id" value="0123"></property>
+        <property name="name" value="James Laurie"></property>
+        <property name="add" ref="Address"></property>
+        <property name="ph" ref="Phone"></property>
+    </bean>
+
+
+    <!-- constructor injection -->
+    <bean id="Student1" class="Student">
+        <constructor-arg name="id" value="0123"></constructor-arg>
+        <constructor-arg name="name" value="James Laurie"></constructor-arg>
+        <constructor-arg name="add" ref="Address1"></constructor-arg>
+        <constructor-arg name="ph" ref="Phone1"></constructor-arg>
+    </bean>
+
+</beans>
