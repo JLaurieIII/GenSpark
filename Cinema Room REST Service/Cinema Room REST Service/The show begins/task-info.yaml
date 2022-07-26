@@ -1,0 +1,191 @@
+type: edu
+files:
+- name: src/cinema/Main.java
+  visible: true
+  text: |
+    package cinema;
+
+    import org.springframework.boot.SpringApplication;
+    import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+    @SpringBootApplication
+    public class Main {
+        public static void main(String[] args) {
+            SpringApplication.run(Main.class, args);
+        }
+    }
+  learner_created: false
+- name: build.gradle
+  visible: true
+  text: |-
+    buildscript {
+        repositories {
+            mavenCentral()
+        }
+        dependencies {
+            classpath "org.springframework.boot:spring-boot-gradle-plugin:$hs.spring.bootVersion"
+            classpath "io.spring.gradle:dependency-management-plugin:$hs.spring.dependencyManagementVersion"
+        }
+    }
+
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    repositories {
+        mavenCentral()
+    }
+
+    sourceSets.main.resources.srcDirs = ["src/resources"]
+
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter'
+        implementation 'org.springframework.boot:spring-boot-starter-actuator'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+    }
+  learner_created: false
+- name: test/CinemaTests.java
+  visible: false
+  text: |-
+    import cinema.Main;
+    import org.hyperskill.hstest.dynamic.DynamicTest;
+    import org.hyperskill.hstest.dynamic.input.DynamicTesting;
+    import org.hyperskill.hstest.mocks.web.response.HttpResponse;
+    import org.hyperskill.hstest.stage.SpringTest;
+    import org.hyperskill.hstest.testcase.CheckResult;
+
+    import static org.hyperskill.hstest.testing.expect.Expectation.expect;
+    import static org.hyperskill.hstest.testing.expect.json.JsonChecker.*;
+
+    public class CinemaTests extends SpringTest {
+
+        public CinemaTests() {
+            super(Main.class, 28852);
+        }
+
+        CheckResult testEndpoint() {
+
+            HttpResponse response = get("/seats").send();
+
+            if (response.getStatusCode() != 200) {
+                return CheckResult.wrong("GET /seats should respond with " +
+                    "status code 200, responded: " + response.getStatusCode() + "\n\n" +
+                    "Response body:\n" + response.getContent());
+            }
+
+            return CheckResult.correct();
+        }
+
+        CheckResult testEndpointAvailableSeats() {
+            HttpResponse response = get("/seats").send();
+
+            expect(response.getContent()).asJson().check(
+                isObject()
+                    .value("available_seats",
+                        isArray(
+                            81,
+                            isObject()
+                            .value("row", isInteger(i -> i >= 1 && i <= 9))
+                            .value("column", isInteger(i -> i >= 1 && i <= 9))
+                        )
+                    )
+                    .value("total_columns", 9)
+                    .value("total_rows", 9)
+            );
+
+            return CheckResult.correct();
+        }
+
+        @DynamicTest
+        DynamicTesting[] dynamicTests = new DynamicTesting[]{
+            this::testEndpoint,
+            this::testEndpointAvailableSeats
+        };
+    }
+  learner_created: false
+- name: src/resources/application.properties
+  visible: true
+  text: |-
+    server.port=28852
+    management.endpoints.web.exposure.include=*
+    management.endpoint.shutdown.enabled=true
+  learner_created: false
+- name: src/cinema/controller/CinemaController.java
+  visible: true
+  learner_created: true
+- name: src/cinema/model/Cinema.java
+  visible: true
+  learner_created: true
+- name: src/cinema/model/Seat.java
+  visible: true
+  learner_created: true
+feedback_link: https://hyperskill.org/projects/189/stages/945/implement#comment
+status: Failed
+feedback:
+  message: "Exception in test #1\n\nCannot start Spring application\n\norg.springframework.beans.factory.UnsatisfiedDependencyException:\
+    \ Error creating bean with name &#39;cinemaController&#39; defined in file [C:\\\
+    Users\\19412\\Desktop\\Cinema Room REST Service\\Cinema Room REST Service\\task\\\
+    build\\classes\\java\\main\\cinema\\controller\\CinemaController.class]: Unsatisfied\
+    \ dependency expressed through constructor parameter 0; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException:\
+    \ No qualifying bean of type &#39;cinema.model.Cinema&#39; available: expected\
+    \ at least 1 bean which qualifies as autowire candidate. Dependency annotations:\
+    \ {}\r\n\tat org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:800)\r\
+    \n\tat org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:229)\r\
+    \n\tat org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1372)\r\
+    \n\tat org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1222)\r\
+    \n\tat org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:582)\r\
+    \n\tat org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542)\r\
+    \n\tat org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335)\r\
+    \n\tat org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)\r\
+    \n\tat org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333)\r\
+    \n\tat org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208)\r\
+    \n\tat org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:944)\r\
+    \n\tat org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:918)\r\
+    \n\tat org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:583)\r\
+    \n\tat org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:145)\r\
+    \n\tat org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)\r\
+    \n\tat org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:434)\r\
+    \n\tat org.springframework.boot.SpringApplication.run(SpringApplication.java:338)\r\
+    \n\tat org.springframework.boot.SpringApplication.run(SpringApplication.java:1343)\r\
+    \n\tat org.springframework.boot.SpringApplication.run(SpringApplication.java:1332)\r\
+    \n\tat cinema.Main.main(Main.java:9)\n\nPlease find below the output of your program\
+    \ during this failed test.\n\n---\n\n.   ____          _            __ _ _\n /\\\
+    \\ / ___&#39;_ __ _ _(_)_ __  __ _ \\ \\ \\ \\\n( ( )\\___ | &#39;_ | &#39;_|\
+    \ | &#39;_ \\/ _` | \\ \\ \\ \\\n \\\\/  ___)| |_)| | | | | || (_| |  ) ) ) )\n\
+    \  &#39;  |____| .__|_| |_|_| |_\\__, | / / / /\n =========|_|==============|___/=/_/_/_/\n\
+    \ :: Spring Boot ::                (v2.5.6)\n\n2022-07-25 20:58:50.432  INFO 6840\
+    \ --- [    Test worker] cinema.Main                              : Starting Main\
+    \ using Java 17.0.4 on DESKTOP-S3MUJV9 with PID 6840 (started by 19412 in C:\\\
+    Users\\19412\\Desktop\\Cinema Room REST Service\\Cinema Room REST Service\\task)\n\
+    2022-07-25 20:58:50.440  INFO 6840 --- [    Test worker] cinema.Main         \
+    \                     : No active profile set, falling back to default profiles:\
+    \ default\n2022-07-25 20:58:52.477  INFO 6840 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer\
+    \  : Tomcat initialized with port(s): 28852 (http)\n2022-07-25 20:58:52.500  INFO\
+    \ 6840 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting\
+    \ service [Tomcat]\n2022-07-25 20:58:52.500  INFO 6840 --- [    Test worker] org.apache.catalina.core.StandardEngine\
+    \  : Starting Servlet engine: [Apache Tomcat/9.0.54]\n2022-07-25 20:58:52.642\
+    \  INFO 6840 --- [    Test worker] o.a.c.c.C.[Tomcat].[localhost].[/]       :\
+    \ Initializing Spring embedded WebApplicationContext\n2022-07-25 20:58:52.642\
+    \  INFO 6840 --- [    Test worker] w.s.c.ServletWebServerApplicationContext :\
+    \ Root WebApplicationContext: initialization completed in 2103 ms\n2022-07-25\
+    \ 20:58:52.962  WARN 6840 --- [    Test worker] ConfigServletWebServerApplicationContext\
+    \ : Exception encountered during context initialization - cancelling refresh attempt:\
+    \ org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating\
+    \ bean with name &#39;cinemaController&#39; defined in file [C:\\Users\\19412\\\
+    Desktop\\Cinema Room REST Service\\Cinema Room REST Service\\task\\build\\classes\\\
+    java\\main\\cinema\\controller\\CinemaController.class]: Unsatisfied dependency\
+    \ expressed through constructor parameter 0; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException:\
+    \ No qualifying bean of type &#39;cinema.model.Cinema&#39; available: expected\
+    \ at least 1 bean which qualifies as autowire candidate. Dependency annotations:\
+    \ {}\n2022-07-25 20:58:52.970  INFO 6840 --- [    Test worker] o.apache.catalina.core.StandardService\
+    \   : Stopping service [Tomcat]\n2022-07-25 20:58:52.996  INFO 6840 --- [    Test\
+    \ worker] ConditionEvaluationReportLoggingListener : \n\nError starting ApplicationContext.\
+    \ To display the conditions report re-run your application with &#39;debug&#39;\
+    \ enabled.\n2022-07-25 20:58:53.029 ERROR 6840 --- [    Test worker] o.s.b.d.LoggingFailureAnalysisReporter\
+    \   : \n\n***************************\nAPPLICATION FAILED TO START\n***************************\n\
+    \nDescription:\n\nParameter 0 of constructor in cinema.controller.CinemaController\
+    \ required a bean of type &#39;cinema.model.Cinema&#39; that could not be found.\n\
+    \n\nAction:\n\nConsider defining a bean of type &#39;cinema.model.Cinema&#39;\
+    \ in your configuration."
+  time: Tue, 26 Jul 2022 00:58:53 UTC
+record: -1
